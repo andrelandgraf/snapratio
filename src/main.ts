@@ -91,20 +91,27 @@ async function checkScreenPermission(): Promise<boolean> {
   const { response } = await dialog.showMessageBox({
     type: "warning",
     title: "SnapRatio needs Screen Recording",
-    message: "SnapRatio needs Screen Recording permission to capture screenshots.",
-    detail: 'Click "Open Settings" to grant access, then relaunch SnapRatio.',
-    buttons: ["Open Settings", "Quit"],
+    message: "Screen Recording permission may not be granted yet.",
+    detail:
+      "If you already enabled it, click Continue. Otherwise, open Settings to grant access, then relaunch.",
+    buttons: ["Continue Anyway", "Open Settings", "Quit"],
     defaultId: 0,
   });
 
-  if (response === 0) {
+  if (response === 1) {
     shell.openExternal(
       "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
     );
+    app.quit();
+    return false;
   }
 
-  app.quit();
-  return false;
+  if (response === 2) {
+    app.quit();
+    return false;
+  }
+
+  return true;
 }
 
 app.whenReady().then(async () => {
