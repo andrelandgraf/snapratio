@@ -1,0 +1,16 @@
+{
+  "name": "snapratio",
+  "version": "1.0.0",
+  "description": "Minimal Mac overlay tool for capturing perfectly cropped social media screenshots",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "bun build src/main.ts --outdir dist --target node --format cjs --external electron && bun build src/preload.ts --outdir dist --target node --format cjs --external electron && cp -r src/renderer dist/renderer",
+    "start": "bun run build && bunx electron dist/main.js",
+    "package": "bun run build && bunx electron-packager . SnapRatio --platform=darwin --arch=arm64 --out=out --overwrite --no-asar --ignore='(src|out|tsconfig|\\.gitignore)'"
+  },
+  "devDependencies": {
+    "@electron/packager": "^19.1.0",
+    "electron": "35",
+    "typescript": "latest"
+  }
+}

@@ -1,0 +1,364 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-app-region: no-drag;
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* 4 opaque overlay panels around the selection (not box-shadow) so macOS
+   transparent-window hit-testing sees real pixels everywhere. */
+.overlay-panel {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+#overlay-top {
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+#overlay-bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#overlay-left {
+  left: 0;
+}
+
+#overlay-right {
+  right: 0;
+}
+
+#selection {
+  position: fixed;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  cursor: move;
+  z-index: 2;
+  animation: appear 0.35s ease-out;
+}
+
+#selection.smooth {
+  transition: left 0.18s ease-out, top 0.18s ease-out, width 0.18s ease-out,
+    height 0.18s ease-out;
+}
+
+#selection.dragging {
+  transition: none !important;
+}
+
+@keyframes appear {
+  from {
+    border-color: rgba(255, 255, 255, 0);
+    opacity: 0;
+  }
+  to {
+    border-color: rgba(255, 255, 255, 0.9);
+    opacity: 1;
+  }
+}
+
+/* Corner brackets */
+.corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: white;
+  border-style: solid;
+  border-width: 0;
+  pointer-events: none;
+}
+
+.corner.tl {
+  top: -2px;
+  left: -2px;
+  border-top-width: 3px;
+  border-left-width: 3px;
+  border-top-left-radius: 4px;
+}
+
+.corner.tr {
+  top: -2px;
+  right: -2px;
+  border-top-width: 3px;
+  border-right-width: 3px;
+  border-top-right-radius: 4px;
+}
+
+.corner.bl {
+  bottom: -2px;
+  left: -2px;
+  border-bottom-width: 3px;
+  border-left-width: 3px;
+  border-bottom-left-radius: 4px;
+}
+
+.corner.br {
+  bottom: -2px;
+  right: -2px;
+  border-bottom-width: 3px;
+  border-right-width: 3px;
+  border-bottom-right-radius: 4px;
+}
+
+/* Rule-of-thirds guides */
+.guide-h,
+.guide-v {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.12;
+}
+
+.guide-h {
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: white;
+}
+
+.guide-h.g1 {
+  top: 33.33%;
+}
+.guide-h.g2 {
+  top: 66.66%;
+}
+
+.guide-v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: white;
+}
+
+.guide-v.g1 {
+  left: 33.33%;
+}
+.guide-v.g2 {
+  left: 66.66%;
+}
+
+/* Safe-zone padding (~5% inset) – keep key content inside this area */
+.safe-zone {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+}
+
+.safe-zone.sz-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5%;
+  border-width: 0 0 1px 0;
+}
+
+.safe-zone.sz-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5%;
+  border-width: 1px 0 0 0;
+}
+
+.safe-zone.sz-left {
+  top: 5%;
+  bottom: 5%;
+  left: 0;
+  width: 5%;
+  border-width: 0 1px 0 0;
+}
+
+.safe-zone.sz-right {
+  top: 5%;
+  bottom: 5%;
+  right: 0;
+  width: 5%;
+  border-width: 0 0 0 1px;
+}
+
+/* Dimensions badge */
+#dimensions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Controls bar – positioned via JS relative to the selection */
+#controls {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(28, 28, 30, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  z-index: 100;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#ratios {
+  display: flex;
+  gap: 3px;
+}
+
+.ratio-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-family: "SF Pro Display", -apple-system, sans-serif;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.ratio-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.ratio-btn.active {
+  background: rgba(59, 130, 246, 0.75);
+  color: white;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+#size-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#size-controls button {
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+#size-controls button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+#size-display {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  min-width: 84px;
+  text-align: center;
+}
+
+#capture-btn {
+  background: rgba(34, 197, 94, 0.8);
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: "SF Pro Display", -apple-system, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.12s ease;
+}
+
+#capture-btn:hover {
+  background: rgba(34, 197, 94, 1);
+}
+
+#capture-btn:active {
+  transform: scale(0.96);
+}
+
+#close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+#close-btn:hover {
+  background: rgba(239, 68, 68, 0.7);
+  color: white;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Toast notification */
+#toast {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(28, 28, 30, 0.92);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 600px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 2000;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

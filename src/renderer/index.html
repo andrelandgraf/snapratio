@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>SnapRatio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="overlay-top" class="overlay-panel"></div>
+    <div id="overlay-bottom" class="overlay-panel"></div>
+    <div id="overlay-left" class="overlay-panel"></div>
+    <div id="overlay-right" class="overlay-panel"></div>
+
+    <div id="selection">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="guide-h g1"></div>
+      <div class="guide-h g2"></div>
+      <div class="guide-v g1"></div>
+      <div class="guide-v g2"></div>
+      <div class="safe-zone sz-top"></div>
+      <div class="safe-zone sz-bottom"></div>
+      <div class="safe-zone sz-left"></div>
+      <div class="safe-zone sz-right"></div>
+      <div id="dimensions"></div>
+    </div>
+
+    <div id="controls">
+      <div id="ratios">
+        <button class="ratio-btn active" data-ratio="16:9">16:9</button>
+        <button class="ratio-btn" data-ratio="1:1">1:1</button>
+        <button class="ratio-btn" data-ratio="4:5">4:5</button>
+        <button class="ratio-btn" data-ratio="1.91:1">1.91:1</button>
+      </div>
+      <div class="divider"></div>
+      <div id="size-controls">
+        <button id="shrink" title="Shrink (-)">−</button>
+        <span id="size-display">800 × 450</span>
+        <button id="grow" title="Grow (+)">+</button>
+      </div>
+      <div class="divider"></div>
+      <button id="capture-btn" title="Capture (Enter / Space)">
+        <span>📸</span> Capture
+      </button>
+      <button id="close-btn" title="Close (Esc)">✕</button>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
